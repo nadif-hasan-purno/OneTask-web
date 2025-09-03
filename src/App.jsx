@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Provider } from "react-redux";
 import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
