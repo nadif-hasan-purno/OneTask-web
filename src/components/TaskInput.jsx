@@ -21,13 +21,6 @@ const TaskInput = () => {
     }
   };
 
-  const durations = [
-    { value: "25", label: "25 minutes" },
-    { value: "45", label: "45 minutes" },
-    { value: "60", label: "1 hour" },
-    { value: "90", label: "1.5 hours" },
-  ];
-
   return (
     <div className="max-w-md mx-auto p-6 bg-base-200 rounded-box shadow-lg">
       <h2 className="text-2xl font-bold mb-6 text-center">Start a New Task</h2>
@@ -48,19 +41,17 @@ const TaskInput = () => {
 
         <div className="form-control">
           <label className="label">
-            <span className="label-text">Duration</span>
+            <span className="label-text">Duration (in minutes)</span>
           </label>
-          <select
+          <input
+            type="number"
             value={duration}
             onChange={(e) => setDuration(e.target.value)}
-            className="select select-bordered w-full"
-          >
-            {durations.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            placeholder="Enter duration in minutes"
+            className="input input-bordered w-full"
+            min="1"
+            required
+          />
         </div>
 
         <button type="submit" className="btn btn-primary w-full">

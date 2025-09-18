@@ -1,25 +1,55 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { completeTask } from "../store/slices/tasksSlice";
+import notificationSound from '../assets/notification.mp3';
 
 const Timer = ({ task }) => {
+  const [endTime, setEndTime] = useState(Date.now() + task.duration * 1000);
   const [timeLeft, setTimeLeft] = useState(task.duration);
   const [progress, setProgress] = useState(100);
+  const [isSoundPlaying, setIsSoundPlaying] = useState(false);
+  const audioRef = useRef(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (timeLeft <= 0) {
-      dispatch(completeTask());
-      return;
-    }
+    audioRef.current = new Audio(notificationSound);
+  }, []);
 
+  useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
-      setProgress((prev) => (timeLeft / task.duration) * 100);
+      const newTimeLeft = Math.round((endTime - Date.now()) / 1000);
+      if (newTimeLeft <= 0) {
+        setTimeLeft(0);
+        setProgress(0);
+        const audio = audioRef.current;
+        if (audio) {
+          audio.loop = true;
+          audio.play();
+        }
+        setIsSoundPlaying(true);
+        clearInterval(timer);
+      } else {
+        setTimeLeft(newTimeLeft);
+        setProgress((newTimeLeft / task.duration) * 100);
+      }
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, [timeLeft, task.duration, dispatch]);
+    return () => {
+      clearInterval(timer);
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, [endTime, task.duration]);
+
+  const stopSoundAndCompleteTask = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    setIsSoundPlaying(false);
+    dispatch(completeTask());
+  };
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -63,12 +93,21 @@ const Timer = ({ task }) => {
         </svg>
       </div>
 
-      <button
-        onClick={() => dispatch(completeTask())}
-        className="btn btn-secondary mt-6"
-      >
-        Complete Task Early
-      </button>
+      {!isSoundPlaying ? (
+        <button
+          onClick={() => dispatch(completeTask())}
+          className="btn btn-secondary mt-6"
+        >
+          Complete Task Early
+        </button>
+      ) : (
+        <button
+          onClick={stopSoundAndCompleteTask}
+          className="btn btn-error mt-4"
+        >
+          Stop Sound and Finish
+        </button>
+      )}
     </div>
   );
 };
