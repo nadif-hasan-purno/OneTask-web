@@ -48,7 +48,7 @@ const Timer = ({ task }) => {
       audioRef.current.currentTime = 0;
     }
     setIsSoundPlaying(false);
-    dispatch(completeTask());
+    dispatch(completeTask({ endTime }));
   };
 
   const formatTime = (seconds) => {

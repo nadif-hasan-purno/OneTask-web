@@ -33,11 +33,11 @@ const tasksSlice = createSlice({
         status: "active",
       };
     },
-    completeTask: (state) => {
+    completeTask: (state, action) => {
       if (state.activeTask) {
         const completedTask = {
           ...state.activeTask,
-          endTime: Date.now(),
+          endTime: action.payload?.endTime || Date.now(),
           status: "completed",
         };
         state.completedTasks.unshift(completedTask);
